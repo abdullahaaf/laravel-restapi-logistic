@@ -24,8 +24,7 @@ class PackageController extends Controller
         $packageModel = new Package();
         $package = $packageModel->getSpecificData($customerCode);
         if (empty($package)) {
-            $message = "No data";
-            $statusCode = 204;
+            return response()->json([], 204);
         } else {
             $message = "Success fetch data";
             $statusCode = 200;
@@ -61,9 +60,8 @@ class PackageController extends Controller
 
         $packageModel = new Package();
         $package = $packageModel->getSpecificData($customerCode);
-        $data = [];
         if (empty($package)) {
-            return $this->apiResponse("No Data", $data, 204);
+            return response()->json([], 204);
         } else {
             $payload = $request->all();
             $payload['transaction_id'] = $package[0]['transaction_id'];
@@ -76,7 +74,7 @@ class PackageController extends Controller
             $payload['destination_data'] = $this->redefineDestinationData($payload, $packageModel);
 
             $packageModel->updateDocument($customerCode, $payload);
-            return $this->apiResponse("Success update transaction", $payload, 200);
+            return $this->apiResponse("Success update transaction", $payload, 201);
         }
     }
 
@@ -84,12 +82,11 @@ class PackageController extends Controller
     {
         $packageModel = new Package();
         $package = $packageModel->getSpecificData($customerCode);
-        $data = [];
         if (empty($package)) {
-            return $this->apiResponse("No Data", $data, 204);
+            return response()->json([], 204);
         } else {
             $packageModel->deleteDocument($customerCode);
-            return $this->apiResponse("Success delete transaction", $data,  201);
+            return $this->apiResponse("Success delete transaction", [], 200);
         }
     }
 
@@ -97,9 +94,8 @@ class PackageController extends Controller
     {
         $packageModel = new Package();
         $package = $packageModel->getSpecificData($customerCode);
-        $data = [];
         if (empty($package)) {
-            return $this->apiResponse("No Data", $data, 204);
+            return response()->json([], 204);
         } else {
             $validator = Validator::make($request->all(), config('validation.validateKoliData'));
             if ($validator->fails()) {
