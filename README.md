@@ -70,9 +70,15 @@ DB_HOST=<mongodb atlas cluster host>
 DB_PORT=27017
 DB_DATABASE=<mongodb database name>
 DB_USERNAME=<mongodb database username>
-DB_PASSWORD=<mongodb database password> 
+DB_PASSWORD=<mongodb database password>
+API_TOKEN=<fill with static jwt>
 ```
 5. Run command 
 ```bash
 php artisan serve
+```
+
+6. To run unit testing, simply with this command 
+```bash
+php artisan test --filter PackageTest
 ```

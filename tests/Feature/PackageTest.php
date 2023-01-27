@@ -184,10 +184,17 @@ class PackageTest extends TestCase
 
     public $wrongCustomerCode = 17986;
     public $customerCode = 1678593;
+    public $headers = ['Authorization' => 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE2NzQ3NzY0NTIsImV4cCI6MTcwODkwNDQ1MiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSIsIkdpdmVuTmFtZSI6IkpvaG5ueSIsIlN1cm5hbWUiOiJSb2NrZXQiLCJFbWFpbCI6Impyb2NrZXRAZXhhbXBsZS5jb20iLCJSb2xlIjpbIk1hbmFnZXIiLCJQcm9qZWN0IEFkbWluaXN0cmF0b3IiXX0.M1wMjZA0NxHBFWyTGcXnJ09m-zGsp-C68JFgy0iPZkk'];
+
+    public function test_request_with_no_token_provided()
+    {
+        $response = $this->json('GET','api/packages', $this->headers);
+        $response->assertStatus(401);
+    }
 
     public function test_json_structure_when_get_all_data()
     {
-        $response = $this->json('GET', 'api/packages');
+        $response = $this->json('GET', 'api/packages', [], $this->headers);
         $response->assertStatus(200)
         ->assertJsonStructure(['code' => 'message'])
         ->assertJsonStructure(['code' => 'data']);
@@ -195,7 +202,7 @@ class PackageTest extends TestCase
 
     public function test_response_code_when_empty_data()
     {
-        $response = $this->get('api/packages/'.$this->wrongCustomerCode);
+        $response = $this->get('api/packages/'.$this->wrongCustomerCode, $this->headers);
         $response->assertStatus(204);
     }
 
@@ -203,7 +210,7 @@ class PackageTest extends TestCase
     {
         unset($this->payload['customer_name']);
         unset($this->payload['koli_data']);
-        $response =  $this->json('POST', 'api/packages', $this->payload);
+        $response =  $this->json('POST', 'api/packages', $this->payload, $this->headers);
         $response->assertStatus(400)
         ->assertJson([
             'error' => [],
@@ -212,7 +219,7 @@ class PackageTest extends TestCase
 
     public function test_create_new_transaction_with_payload_provided()
     {
-        $response =  $this->json('POST', 'api/packages', $this->payload);
+        $response =  $this->json('POST', 'api/packages', $this->payload, $this->headers);
         $response->assertStatus(201)
         ->assertJson([
             'message' => 'Success create transaction',
@@ -222,13 +229,13 @@ class PackageTest extends TestCase
 
     public function test_update_certain_transaction_with_wrong_customer_code()
     {
-        $response = $this->json('PUT', 'api/packages/'.$this->wrongCustomerCode, $this->payload);
+        $response = $this->json('PUT', 'api/packages/'.$this->wrongCustomerCode, $this->payload, $this->headers);
         $response->assertStatus(204);
     }
 
     public function test_update_certain_transaction()
     {
-        $response = $this->json('PUT', 'api/packages/' . $this->customerCode, $this->payload);
+        $response = $this->json('PUT', 'api/packages/' . $this->customerCode, $this->payload, $this->headers);
         $response->assertStatus(201)
         ->assertJson([
             'message' => 'Success update transaction',
@@ -238,13 +245,14 @@ class PackageTest extends TestCase
 
     public function test_add_koli_data_with_wrong_customer_code()
     {
-        $response = $this->json('PATCH', 'api/kolidata/'.$this->wrongCustomerCode, $this->payloadKoliData);
+        $response = $this->json('PATCH', 'api/kolidata/'.$this->wrongCustomerCode,
+        $this->payloadKoliData, $this->headers);
         $response->assertStatus(204);
     }
 
     public function test_add_koli_data_with_()
     {
-        $response = $this->json('PATCH', 'api/kolidata/' . $this->customerCode, $this->payloadKoliData);
+        $response = $this->json('PATCH', 'api/kolidata/' . $this->customerCode, $this->payloadKoliData, $this->headers);
         $response->assertStatus(201)
         ->assertJson([
             'message' => 'Success add kolidata',
@@ -254,13 +262,13 @@ class PackageTest extends TestCase
 
     public function test_delete_certain_transaction_with_wrong_customer_code()
     {
-        $response = $this->json('DELETE', 'api/packages/' . $this->wrongCustomerCode);
+        $response = $this->json('DELETE', 'api/packages/' . $this->wrongCustomerCode, [], $this->headers);
         $response->assertStatus(204);
     }
 
     public function test_delete_certain_transaction()
     {
-        $response = $this->json('DELETE', 'api/packages/' . $this->customerCode);
+        $response = $this->json('DELETE', 'api/packages/' . $this->customerCode, [], $this->headers);
         $response->assertStatus(200)
             ->assertJson([
                 'message' => 'Success delete transaction',
